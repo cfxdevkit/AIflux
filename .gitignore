@@ -1,4 +1,5 @@
 node_modules
+.pnpm-store
 /out
 
 .env
@@ -40,6 +41,7 @@ timeline_cache.json
 *.sqlite
 
 characters/
+!characters/aiflux.character.json
 
 packages/core/src/providers/cache
 packages/core/src/providers/cache/*
