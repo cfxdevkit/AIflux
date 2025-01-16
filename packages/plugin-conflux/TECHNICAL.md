@@ -10,6 +10,7 @@
 
 The Conflux plugin relies on several environment variables for configuration. The plugin's functionality is determined by the combination of these variables.
 
+
 ### Critical Variables
 ```env
 # Required - Plugin will not activate without this
@@ -135,27 +136,109 @@ CONFLUX_ESPACE_CONFLUXSCAN_HOST=<host>      # Custom ConfluxScan eSpace host
 
 The Conflux plugin is structured into several key components:
 
-### Core Components
+### Components
 
-![AIflux Architecture-2025-01-12-013844](https://github.com/user-attachments/assets/46c0876e-3313-41cd-a0be-bd72e80f8bd2)
+```mermaid
+graph TB
+    subgraph Core
+        CP[Plugin Core]
+        CA[Actions]
+        CPR[Providers]
+        CE[Evaluators]
+    end
 
+    subgraph Actions
+        direction LR
+        CA --> |creates| A1[Address Lookup]
+        CA --> |creates| A2[Wallet]
+        CA --> |creates| A3[Bridge & Transfers]
+    end
+
+    subgraph Providers
+        CPR --> CP1[Common]
+        CPR --> CP2[Core Network]
+        CPR --> CP3[eSpace Network]
+
+        subgraph Common Features
+            CP1 --> |provides| F1[Token Info]
+            CP1 --> |provides| F2[Market Data]
+            CP1 --> |provides| F3[Analytics]
+        end
+
+        subgraph Network Stats
+            CP2 & CP3 --> |track| S1[Accounts]
+            CP2 & CP3 --> |track| S2[Transactions]
+            CP2 & CP3 --> |track| S3[Contracts]
+            CP2 & CP3 --> |track| S4[Top Lists]
+        end
+    end
+
+    subgraph External
+        E1[ConfluxScan APIs]
+        E2[GeckoTerminal]
+        E3[DeFiLlama]
+    end
+
+    CP --> |validates| CA & CPR & CE
+    CPR --> |uses| E1 & E2 & E3
+    CA --> |uses| E1
+```
+
+### Data Flow
+
+```mermaid
+graph LR
+    U[User Query] --> |processed by| A[Actions]
+    A --> |fetches data| P[Providers]
+    P --> |caches| C[Cache Manager]
+    P --> |calls| E[External APIs]
+    E --> |returns| P
+    P --> |formats| R[Response]
+    R --> |displays to| U
+```
 
 ### Package Dependencies
 
-![Untitled diagram-2025-01-12-014407](https://github.com/user-attachments/assets/96f40dbf-6f37-4268-a315-3f1de8c0125f)
+```mermaid
+---
+config:
+  theme: neo-dark
+  layout: elk
+---
+graph LR
+    subgraph Core Dependencies
+        EP[@elizaos/plugin-conflux] --> EC[@elizaos/core]
+        EP --> CIVE[@cive:0.8.1]
+        EP --> SCURE1[@scure/bip32]
+        EP --> SCURE2[@scure/bip39]
+        EP --> VIEM[viem]
+    end
 
+    subgraph API Integrations
+        EP --> CSC[@conflux-lib/openapi-sdk-core:1.0.0]
+        EP --> CSE[@conflux-lib/openapi-sdk-evm:1.0.0]
+    end
+
+    subgraph Build Tools
+        EP --> TSUP[tsup]
+        EP --> TS[typescript]
+        EP --> ZOD[zod]
+    end
+```
 
 ## Function Listings
 
-### 1. Core Actions
+### 1. Actions
 
 #### Bridge Operations
 ```typescript
 createBridgeAction(config: ValidatedConfig): Action
 - Name: "BRIDGE_CFX"
 - Description: Bridge CFX tokens from Core to eSpace network
+- Location: src/actions/bridge/
 - Key Functions:
   - executeBridgeOperation(): Handles the actual bridge transaction
+  - validateBridgeParams(): Validates bridge parameters
 - Parameters:
   - toAddress: eSpace destination address
   - amount: Amount of CFX to bridge
@@ -166,9 +249,11 @@ createBridgeAction(config: ValidatedConfig): Action
 createCfxTransferAction(config: ValidatedConfig): Action
 - Name: "SEND_CFX"
 - Description: Transfer CFX tokens on Core or eSpace network
+- Location: src/actions/cfx-transfer/
 - Features:
   - Auto-detects network from address format
   - Supports both Core and eSpace transfers
+  - Gas estimation and optimization
 - Parameters:
   - toAddress: Destination address (cfx:... or 0x...)
   - amount: Amount to transfer
@@ -179,9 +264,10 @@ createCfxTransferAction(config: ValidatedConfig): Action
 createTokenTransferAction(config: ValidatedConfig): Action
 - Name: "SEND_TOKEN"
 - Description: Transfer tokens on Core or eSpace network
+- Location: src/actions/token-transfer/
 - Requirements:
   - Configured wallet (Core or eSpace)
-  - ConfluxScan access
+  - ConfluxScan access for token validation
 - Parameters:
   - tokenSymbol: Token symbol to transfer
   - toAddress: Destination address
@@ -193,235 +279,53 @@ createTokenTransferAction(config: ValidatedConfig): Action
 createEspaceSwapAction(config: ValidatedConfig): Action
 - Name: "SWAP_ESPACE"
 - Description: Swap tokens on Conflux eSpace network
+- Location: src/actions/espace-swap/
 - Requirements:
-  - eSpace wallet
-  - Token list manager
+  - eSpace wallet configuration
+  - Token list manager for validation
+  - Price data for slippage calculation
 - Parameters:
   - fromToken: Source token symbol
   - toToken: Destination token symbol
   - amount: Amount to swap
 ```
 
-### 2. Utility Functions
-
-#### Wallet Operations
+#### ConfiPump Operations
 ```typescript
-// Core Wallet
-CoreWallet class:
-- crossSpaceCall(): Bridge tokens between networks
-- transfer(): Send CFX tokens
-- tokenTransfer(): Send other tokens
-
-// eSpace Wallet
-EspaceWallet class:
-- transfer(): Send CFX tokens
-- tokenTransfer(): Send other tokens
-- swap(): Perform token swaps
+confiPump: Action
+- Name: "CONFI_PUMP_ESPACE"
+- Description: Perform actions on ConfiPump on Conflux eSpace network
+- Location: src/actions/confipump/
+- Features:
+  - Create new tokens
+  - Buy tokens
+  - Sell tokens
+- Operations:
+  1. Create Token:
+     - Parameters:
+       - name: Token name
+       - symbol: Token symbol
+       - description: Token description
+  2. Buy Token:
+     - Parameters:
+       - tokenAddress: Token contract address
+       - value: Amount of CFX to spend
+  3. Sell Token:
+     - Parameters:
+       - tokenAddress: Token contract address
+       - amount: Amount of tokens to sell
 ```
 
-#### ConfluxScan Integration
+#### Address Lookup
 ```typescript
-ConfluxScanBase class:
-- Base functionality for both networks
-- Shared methods:
-  - getActiveAccounts()
-  - getCfxHolders()
-  - getAccountGrowth()
-  - getContracts()
-  - getTransactions()
-  - getCfxTransfers()
-  - getTps()
-  - getGasUsed()
+createAddressLookupAction(config: ValidatedConfig): Action
+- Name: "ADDRESS_LOOKUP"
+- Description: Look up address information on Conflux network
+- Location: src/actions/address-lookup/
+- Features:
+  - Address validation
+  - Network detection
+  - Balance checking
+- Parameters:
+  - address: Address to look up
 ```
-
-### 3. Provider Functions
-
-#### Core Network Providers
-```typescript
-- getCoreWalletProvider(): Wallet operations
-- getCoreAccountGrowthProvider(): Account statistics
-- getCoreActiveAccountsProvider(): Active account data
-- getCoreCfxHoldersProvider(): CFX holder statistics
-- getCoreTransactionsProvider(): Transaction data
-- getCoreTpsProvider(): TPS statistics
-```
-
-#### eSpace Network Providers
-```typescript
-- getEspaceWalletProvider(): Wallet operations
-- getEspaceActiveAccountsProvider(): Active account data
-- getEspaceCfxHoldersProvider(): CFX holder statistics
-- getEspaceTransactionsProvider(): Transaction data
-- getEspaceTopTokenParticipantsProvider(): Token statistics
-```
-
-#### Common Providers
-```typescript
-- getTokensProvider(): Token information
-- getGeckoTerminalProvider(): Price data
-```
-
-## API Integrations
-
-### 1. ConfluxScan API Integration
-
-#### Core Network API (`@conflux-lib/openapi-sdk-core`)
-```typescript
-Base URL:
-- Mainnet: https://api.confluxscan.net
-- Testnet: https://api-testnet.confluxscan.net
-
-Endpoints:
-1. Accounts API
-   - accountTokensGet(): Get token balances for an address
-   - Account statistics and growth metrics
-
-2. Statistics API
-   - Active accounts statistics
-   - CFX holder statistics
-   - Transaction statistics
-   - Supply information
-   - Mining statistics
-   - Gas usage metrics
-   - Top addresses (senders/receivers)
-```
-
-#### eSpace Network API (`@conflux-lib/openapi-sdk-evm`)
-```typescript
-Base URL:
-- Mainnet: https://evmapi.confluxscan.io
-- Testnet: https://evmapi-testnet.confluxscan.io
-
-Endpoints:
-1. Accounts API
-   - Token balances and transfers
-   - Account statistics
-   - EVM-compatible address operations
-
-2. Statistics API
-   - Transaction metrics
-   - Gas usage
-   - Token transfers
-   - Contract interactions
-```
-
-### 2. Blockchain Network Integration
-
-#### Core Network (via `cive`)
-```typescript
-Features:
-1. Transaction Operations
-   - transfer(): Send CFX
-   - tokenTransfer(): Send tokens
-   - crossSpaceCall(): Bridge operations
-
-2. Contract Interactions
-   - Read contract data
-   - Execute contract methods
-   - Handle token approvals
-
-3. Account Management
-   - Address validation
-   - Balance checking
-   - Key derivation
-```
-
-#### eSpace Network (via `viem`)
-```typescript
-Features:
-1. Wallet Operations
-   - createWalletClient(): Create wallet instance
-   - createPublicClient(): Create public client
-   - sendTransaction(): Send transactions
-
-2. Token Operations
-   - approve(): Token approvals
-   - transfer(): Token transfers
-   - swap(): Token swaps
-
-3. Contract Interactions
-   - readContract(): Read contract state
-   - writeContract(): Write to contracts
-   - encodeFunctionData(): ABI encoding
-```
-
-### 3. Price Data Integration (GeckoTerminal)
-```typescript
-class GeckoTerminal {
-    Features:
-    1. Price Feeds
-       - Get token prices
-       - Price history
-       - Market data
-
-    2. Pool Information
-       - Liquidity pools
-       - Trading pairs
-       - Volume data
-}
-```
-
-### 4. Data Formatting and Caching
-
-```typescript
-1. Base Formatter:
-   - Format account statistics
-   - Format transaction data
-   - Format token information
-   - Handle timestamps and caching
-
-2. Network-Specific Formatters:
-   Core Formatter:
-   - formatCoreTokens()
-   - formatMiners()
-   - formatSupply()
-
-   eSpace Formatter:
-   - formatESpaceTokens()
-   - formatTokenParticipants()
-   - formatTokenTransfers()
-```
-
-### 5. Configuration and Authentication
-
-```typescript
-1. API Configuration:
-   - API key management
-   - Network selection (mainnet/testnet)
-   - Endpoint configuration
-
-2. Authentication:
-   - API key validation
-   - Rate limiting handling
-   - Error management
-
-3. Cache Management:
-   - Timestamp caching
-   - Data caching
-   - Cache invalidation
-```
-
-### 6. Error Handling and Logging
-
-```typescript
-1. Error Types:
-   - Network errors
-   - API response errors
-   - Validation errors
-   - Rate limiting errors
-
-2. Logging:
-   - Debug logging
-   - Error logging
-   - Transaction logging
-   - Performance metrics
-```
-
-Each API integration includes:
-- Type safety with TypeScript
-- Error handling and retries
-- Data validation
-- Rate limiting consideration
-- Caching mechanisms
-- Formatted responses
-- Network-specific adaptations

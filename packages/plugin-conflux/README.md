@@ -4,7 +4,7 @@ A plugin for interacting with the Conflux blockchain network within the ElizaOS 
 
 ## Description
 
-The Conflux plugin enables seamless interaction with both Conflux Core Space and eSpace networks. It provides functionality for token transfers, cross-space bridge operations, token swaps on eSpace, and network statistics.
+The Conflux plugin enables seamless interaction with both Conflux Core Space and eSpace networks. It provides functionality for token transfers, cross-space bridge operations, token swaps on eSpace, market analysis, and comprehensive network statistics.
 
 ## Installation
 
@@ -74,6 +74,15 @@ const runtime = new AgentRuntime({
 "Swap 1 CFX for USDT"
 "Exchange 50 USDT for ETH"
 
+// ConfiPump Operations
+"Create a new token called GLITCHIZA with symbol GLITCHIZA and generate a description about it on eSpace"
+"Buy 0.00069 CFX worth of GLITCHIZA(0x1234567890abcdef) on eSpace"
+"Sell 0.00069 CFX worth of GLITCHIZA(0x1234567890abcdef) on eSpace"
+
+// Address Lookup
+"Look up address cfx:aaejuaaaaaaaaaaaaaaaaaaaaaaaaaaaa2eaeg85p5"
+"Check balance of 0x119DA8bbe74B1C5c987D0c64D10eC1dB301d4752"
+
 // Data & Analytics Queries
 "What's the current price of CFX?"
 "Show me the trading volume for USDT token"
@@ -86,24 +95,27 @@ const runtime = new AgentRuntime({
 
 The plugin includes several data providers that can be queried using natural language:
 
-1. **Price & Market Data**
-   - GeckoTerminal integration for real-time price feeds
-   - Trading volume and market cap information
-   - DEX analytics and liquidity data
+1. **Common Providers**
+   - Token information and management
+   - GeckoTerminal price feeds and market data
+   - DeFiLlama TVL and protocol analytics
+   - Market analysis and trends
 
-2. **Network Statistics**
-   - ConfluxScan data for both Core and eSpace
-   - Transaction history and status (WIP)
-   - Account balances and token holdings
-   - Network metrics and gas prices
+2. **Core Network Providers**
+   - Wallet operations
+   - Account statistics and growth
+   - Transaction data and TPS
+   - Top miners and gas users
+   - CFX transfers and holders
+   - Contract interactions
 
-3. **Token Information**
-   - Token metadata and contract details
-   - Token balances and transfers
-   - Token price and trading data
-   - Token holder statistics
-
-These providers can be accessed through natural language queries, allowing the agent to understand and respond to questions about market conditions, network status, and account information without requiring specific API calls or technical syntax.
+3. **eSpace Network Providers**
+   - Wallet operations
+   - Account statistics
+   - Transaction data
+   - Token analytics
+   - Top senders and receivers
+   - Gas usage statistics
 
 ## API Reference
 
