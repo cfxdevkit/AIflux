@@ -172,7 +172,7 @@ export class GeckoTerminal {
     public async getFormattedMultiPoolInfo(
         poolAddresses: string[]
     ): Promise<FormattedPool[]> {
-        elizaLogger.info(
+        elizaLogger.debug(
             `Getting formatted info for ${poolAddresses.length} pools`
         );
         elizaLogger.debug(`Pool addresses: ${poolAddresses.join(", ")}`);
@@ -192,7 +192,7 @@ export class GeckoTerminal {
                 }
             });
 
-            elizaLogger.info(
+            elizaLogger.debug(
                 `Successfully formatted ${formattedPools.length} pools`
             );
             return formattedPools;

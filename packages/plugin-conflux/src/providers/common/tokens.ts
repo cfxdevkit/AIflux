@@ -24,7 +24,7 @@ export function getTokensProvider(config: ValidatedConfig): Provider | null {
 
             try {
                 const cachedData = await cache.get(cacheKey);
-                elizaLogger.info("Tokens provider cache check:", {
+                elizaLogger.debug("Tokens provider cache check:", {
                     provider: "tokens",
                     hasCachedData: cachedData !== null
                 });
@@ -48,7 +48,7 @@ export function getTokensProvider(config: ValidatedConfig): Provider | null {
                 }
 
                 await cache.set(cacheKey, formattedTokens, { expires: CACHE_DURATION });
-                elizaLogger.info("Token data cached successfully", {
+                elizaLogger.debug("Token data cached successfully", {
                     provider: "tokens",
                     cacheKey,
                     cacheDuration: CACHE_DURATION,

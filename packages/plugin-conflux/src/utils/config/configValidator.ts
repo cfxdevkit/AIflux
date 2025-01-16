@@ -30,7 +30,7 @@ export async function validateConfig(
         return null;
     }
 
-    elizaLogger.info(`Initializing Conflux config for ${target}`);
+    elizaLogger.debug(`Initializing Conflux config for ${target}`);
 
     let coreWallet: CoreWallet | undefined;
     let espaceWallet: EspaceWallet | undefined;
@@ -149,7 +149,7 @@ export async function validateConfig(
         defiLlama,
     };
 
-    elizaLogger.info("Config validation completed", {
+    elizaLogger.debug("Config validation completed", {
         hasCoreWallet: !!coreWallet,
         hasEspaceWallet: !!espaceWallet,
         hasCoreConfluxScan: !!coreConfluxScan,

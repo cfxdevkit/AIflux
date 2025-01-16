@@ -41,12 +41,12 @@ async function getTVLAnalysis(chain: string, runtime: IAgentRuntime, defiLlama: 
         const hasCachedData = chainData !== null && protocolsData !== null;
 
         if (hasCachedData) {
-            elizaLogger.info("Using cached DeFiLlama TVL data");
+            elizaLogger.debug("Using cached DeFiLlama TVL data");
             return `${chainData}\n\n${protocolsData}`;
         }
 
         // Get chain TVL
-        elizaLogger.info("Fetching chain and protocol TVL data");
+        elizaLogger.debug("Fetching chain and protocol TVL data");
         const chainTVL = await defiLlama.getChainTVL(chain);
         const chainResponse = defiLlama.formatTVLToText(chainTVL, chain);
 
@@ -116,7 +116,8 @@ export function getMarketAnalysisProvider(config: MarketAnalysisConfig): Provide
             }
 
             try {
-                return await getAnalysisData(runtime, { type: analysisType, limit });
+                return `${await getAnalysisData(runtime, { type: analysisType, limit })}\n\n${POOL_ANALYSIS_INSTRUCTIONS}`;
+
             } catch (error) {
                 elizaLogger.error("Error in market analysis provider:", error);
                 return null;

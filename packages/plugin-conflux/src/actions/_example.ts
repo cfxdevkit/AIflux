@@ -57,7 +57,7 @@ async function executeAction(
     config: ActionConfig,
     params: ActionParams
 ): Promise<{ status: string; data?: any; error?: string }> {
-    elizaLogger.info("[Template] Starting action execution", { params });
+    elizaLogger.debug("[Template] Starting action execution", { params });
 
     try {
         // First validate that the type is one of the allowed types
@@ -112,8 +112,8 @@ export function createAction(config: ActionConfig): Action {
         similes: ["TEMPLATE", "EXECUTE_TEMPLATE", "RUN_TEMPLATE"],
         suppressInitialMessage: true,
         validate: async (runtime: IAgentRuntime, _message: Memory) => {
-            elizaLogger.info("[Template] Validating runtime configuration");
-            elizaLogger.info("[Template]", !!config.requiredService);
+            elizaLogger.debug("[Template] Validating runtime configuration");
+            elizaLogger.debug("[Template]", !!config.requiredService);
             return !!config.requiredService;
         },
         handler: async (
@@ -123,16 +123,16 @@ export function createAction(config: ActionConfig): Action {
             _options: any,
             callback: HandlerCallback
         ) => {
-            elizaLogger.info("[Template] Starting action handler");
+            elizaLogger.debug("[Template] Starting action handler");
 
             try {
                 if (!state) {
-                    elizaLogger.info(
+                    elizaLogger.debug(
                         "[Template] No state provided, composing new state"
                     );
                     state = await runtime.composeState(message);
                 } else {
-                    elizaLogger.info("[Template] Updating existing state");
+                    elizaLogger.debug("[Template] Updating existing state");
                     state = await runtime.updateRecentMessageState(state);
                 }
 
@@ -217,7 +217,7 @@ Example invalid: "type45" (must error, do not try to convert to valid type)`,
                     schema: ActionParamsSchema,
                 })) as { object: ActionParams };
 
-                elizaLogger.info(
+                elizaLogger.debug(
                     "[Template] Generated action details",
                     actionDetails.object
                 );

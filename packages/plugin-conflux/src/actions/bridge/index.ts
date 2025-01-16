@@ -21,7 +21,7 @@ async function executeBridgeOperation(
     params: BridgeParams,
     callback: HandlerCallback
 ): Promise<{ tx: `0x${string}`; successMessage: string }> {
-    elizaLogger.info("Starting bridge operation", {
+    elizaLogger.debug("Starting bridge operation", {
         operation: "BridgeCFX",
         amount: params.amount,
         toAddress: params.toAddress,
@@ -75,7 +75,7 @@ async function executeBridgeOperation(
             amount: params.amount,
         });
 
-        elizaLogger.info("Bridge transaction submitted", {
+        elizaLogger.debug("Bridge transaction submitted", {
             operation: "BridgeCFX",
             transactionHash: tx
         });
@@ -107,7 +107,7 @@ async function executeBridgeOperation(
             config.espaceWallet?.getBalance() || "0",
         ]);
 
-        elizaLogger.info("Bridge operation completed successfully", {
+        elizaLogger.debug("Bridge operation completed successfully", {
             operation: "BridgeCFX",
             transactionHash: tx,
             balanceChanges: {
@@ -173,7 +173,7 @@ export function createBridgeAction(config: ValidatedConfig): Action {
             _options: any,
             callback: HandlerCallback
         ) => {
-            elizaLogger.info("Starting bridge handler", {
+            elizaLogger.debug("Starting bridge handler", {
                 operation: "BridgeCFX",
                 messageId: message.id
             });

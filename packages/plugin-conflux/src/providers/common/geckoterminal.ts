@@ -22,7 +22,7 @@ export function getGeckoTerminalProvider(
             try {
                 // Check cache first
                 const cachedPools = await cache.get(cacheKey);
-                elizaLogger.info("GeckoTerminal provider cache check:", {
+                elizaLogger.debug("GeckoTerminal provider cache check:", {
                     provider: "geckoterminal",
                     hasCachedData: cachedPools !== null
                 });

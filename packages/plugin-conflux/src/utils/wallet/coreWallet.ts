@@ -178,18 +178,18 @@ export class CoreWallet {
     }
 
     async waitForTransaction(hash: `0x${string}`): Promise<void> {
-        elizaLogger.info("[Core Wallet] Waiting for transaction", { hash });
+        elizaLogger.debug("[Core Wallet] Waiting for transaction", { hash });
         const receipt = await this.publicClient.waitForTransactionReceipt({
             hash,
         });
-        elizaLogger.info("[Core Wallet] Transaction confirmed", {
+        elizaLogger.debug("[Core Wallet] Transaction confirmed", {
             status: receipt.outcomeStatus,
             blockNumber: receipt.epochNumber,
         });
     }
 
     async getTokenBalance(tokenAddress: Address): Promise<string> {
-        elizaLogger.info("[Core Wallet] Fetching token balance", {
+        elizaLogger.debug("[Core Wallet] Fetching token balance", {
             token: tokenAddress,
             account: this.account.address,
         });
@@ -203,7 +203,7 @@ export class CoreWallet {
 
         const formatted = this.formatTokenAmount(balance.toString(), 18);
 
-        elizaLogger.info("[Core Wallet] Token balance result", {
+        elizaLogger.debug("[Core Wallet] Token balance result", {
             rawBalance: balance.toString(),
             formattedBalance: formatted
         });

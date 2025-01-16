@@ -1,0 +1,12 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/docker-existing-dockerfile
+{
+    "name": "Conflux DevKit",
+    "build": {
+        "context": "..",
+        "dockerfile": "Dockerfile",
+        "args": {},
+        "target": "cfx-eliza"
+    },
+    "postCreateCommand": "pnpm install --no-frozen-lockfile && pnpm build"
+}

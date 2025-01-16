@@ -39,8 +39,7 @@ twitter_cookies.json
 timeline_cache.json
 
 *.sqlite
-
-characters/
+characters/*
 !characters/aiflux.character.json
 
 packages/core/src/providers/cache

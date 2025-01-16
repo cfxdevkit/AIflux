@@ -73,6 +73,6 @@ export class ConfluxProviders {
             getEspaceTopCfxReceiversProvider(this.confluxConfig),
             getEspaceTopTransactionSendersProvider(this.confluxConfig),
             getEspaceTopTransactionReceiversProvider(this.confluxConfig),
-        ].filter((provider): provider is Provider => provider !== null);
+        ]
     }
 }

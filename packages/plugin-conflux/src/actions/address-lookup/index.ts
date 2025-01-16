@@ -37,7 +37,7 @@ async function executeAddressLookup(
     config: ValidatedConfig,
     params: AddressLookupParams
 ): Promise<{ info: AddressInfo; successMessage: string }> {
-    elizaLogger.info("Starting address lookup operation", {
+    elizaLogger.debug("Starting address lookup operation", {
         address: params.address,
         operation: "AddressLookup"
     });
@@ -262,7 +262,7 @@ export function createAddressLookupAction(config: ValidatedConfig): Action {
             _options: any,
             callback: HandlerCallback
         ) => {
-            elizaLogger.info("Starting address lookup handler", {
+            elizaLogger.debug("Starting address lookup handler", {
                 operation: "AddressLookup",
                 messageId: message.id
             });
@@ -287,7 +287,7 @@ export function createAddressLookupAction(config: ValidatedConfig): Action {
 
                     const params: AddressLookupParams = actionDetails.object;
 
-                    elizaLogger.info(
+                    elizaLogger.debug(
                         "[AddressLookup] Generated action details",
                         params
                     );

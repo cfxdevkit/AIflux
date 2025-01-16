@@ -29,7 +29,7 @@ export class ConfluxEvaluators {
                     const cachedData = await runtime.cacheManager.get(cacheKey);
                     const needsUpdate = cachedData === null;
 
-                    elizaLogger.info("GeckoTerminal evaluator check result:", {
+                    elizaLogger.debug("GeckoTerminal evaluator check result:", {
                         evaluator: "conflux-geckoterminal",
                         needsUpdate,
                         hasCachedData: !needsUpdate
@@ -93,7 +93,7 @@ export class ConfluxEvaluators {
 
                     const needsUpdate = expiredKeys.length > 0;
 
-                    elizaLogger.info("ConfluxScan Core evaluator check result:", {
+                    elizaLogger.debug("ConfluxScan Core evaluator check result:", {
                         evaluator: "conflux-scan-core",
                         needsUpdate,
                         hasCachedData: !needsUpdate,
@@ -159,7 +159,7 @@ export class ConfluxEvaluators {
 
                     const needsUpdate = expiredKeys.length > 0;
 
-                    elizaLogger.info("ConfluxScan eSpace evaluator check result:", {
+                    elizaLogger.debug("ConfluxScan eSpace evaluator check result:", {
                         evaluator: "conflux-scan-espace",
                         needsUpdate,
                         hasCachedData: !needsUpdate,
@@ -330,7 +330,7 @@ export class ConfluxEvaluators {
 
                     const needsUpdate = expiredKeys.length > 0;
 
-                    elizaLogger.info("DeFiLlama evaluator cache check:", {
+                    elizaLogger.debug("DeFiLlama evaluator cache check:", {
                         evaluator: "conflux-defillama",
                         needsUpdate,
                         hasCachedData: !needsUpdate,
@@ -371,7 +371,7 @@ export class ConfluxEvaluators {
                     const cachedData = await runtime.cacheManager.get(cacheKey);
                     const needsUpdate = cachedData === null;
 
-                    elizaLogger.info("Tokens evaluator cache check:", {
+                    elizaLogger.debug("Tokens evaluator cache check:", {
                         evaluator: "conflux-tokens",
                         needsUpdate,
                         hasCachedData: !needsUpdate,

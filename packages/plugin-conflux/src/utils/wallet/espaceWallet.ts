@@ -88,7 +88,7 @@ export class EspaceWallet {
         });
         const formatted = formatEther(balance);
         const result = Number(formatted).toFixed(4);
-        elizaLogger.info(`eSpace wallet balance: ${result} CFX`);
+        elizaLogger.debug(`eSpace wallet balance: ${result} CFX`);
         return result;
     }
 
@@ -278,7 +278,7 @@ export class EspaceWallet {
     }
 
     async checkAllowance(tokenAddress: Address): Promise<bigint> {
-        elizaLogger.info("[eSpace Wallet] Checking token allowance", {
+        elizaLogger.debug("[eSpace Wallet] Checking token allowance", {
             token: tokenAddress,
             spender: this.dexRouter,
             owner: this.account.address,
@@ -291,25 +291,25 @@ export class EspaceWallet {
             args: [this.account.address, this.dexRouter],
         });
 
-        elizaLogger.info("[eSpace Wallet] Allowance result", {
+        elizaLogger.debug("[eSpace Wallet] Allowance result", {
             allowance: allowance.toString(),
         });
         return allowance;
     }
 
     async waitForTransaction(hash: `0x${string}`): Promise<void> {
-        elizaLogger.info("[eSpace Wallet] Waiting for transaction", { hash });
+        elizaLogger.debug("[eSpace Wallet] Waiting for transaction", { hash });
         const receipt = await this.publicClient.waitForTransactionReceipt({
             hash,
         });
-        elizaLogger.info("[eSpace Wallet] Transaction confirmed", {
+        elizaLogger.debug("[eSpace Wallet] Transaction confirmed", {
             status: receipt.status,
             blockNumber: receipt.blockNumber,
         });
     }
 
     async getTokenBalance(tokenAddress: Address): Promise<string> {
-        elizaLogger.info("[eSpace Wallet] Fetching token balance", {
+        elizaLogger.debug("[eSpace Wallet] Fetching token balance", {
             token: tokenAddress,
             account: this.account.address,
         });
@@ -324,7 +324,7 @@ export class EspaceWallet {
         // Format the balance before returning
         const formatted = this.formatTokenAmount(balance.toString(), 18); // We could also fetch decimals from the contract
 
-        elizaLogger.info("[eSpace Wallet] Token balance result", {
+        elizaLogger.debug("[eSpace Wallet] Token balance result", {
             rawBalance: balance.toString(),
             formattedBalance: formatted
         });

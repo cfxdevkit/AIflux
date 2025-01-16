@@ -112,12 +112,12 @@ export class TokenListManager {
 
         // If tokenList is empty after GeckoTerminal load, use default list
         if (Object.keys(this.tokenList).length === 0) {
-            elizaLogger.info("No tokens loaded from GeckoTerminal, using default token list");
+            elizaLogger.debug("No tokens loaded from GeckoTerminal, using default token list");
             this.tokenList = target === "mainnet"
                 ? MAINNET_DEFAULT_TOKENS
                 : TESTNET_DEFAULT_TOKENS;
 
-            elizaLogger.info(`Loaded ${Object.keys(this.tokenList).length} default tokens for ${target}`);
+            elizaLogger.debug(`Loaded ${Object.keys(this.tokenList).length} default tokens for ${target}`);
         }
 
         if (this.espaceWalletAddress) {
@@ -144,7 +144,7 @@ export class TokenListManager {
                 )
             );
 
-            elizaLogger.info(
+            elizaLogger.debug(
                 `Found ${uniqueTokenAddresses.length} unique tokens to fetch`
             );
 
@@ -210,10 +210,10 @@ export class TokenListManager {
                 (pool) => Number(pool.reserveUSD) >= this.minReserveUSD
             );
 
-            elizaLogger.info(
+            elizaLogger.debug(
                 `Successfully loaded ${Object.keys(this.tokenList).length} tokens`
             );
-            elizaLogger.info(
+            elizaLogger.debug(
                 `Filtered to ${this.pools.length} pools with minimum reserve of $${this.minReserveUSD}`
             );
         } catch (error) {

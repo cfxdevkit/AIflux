@@ -39,7 +39,7 @@ export function getDefiLlamaProvider(config: ValidatedConfig): Provider | null {
 
             const hasCachedData = isValidChainData && isValidProtocolsData;
 
-            elizaLogger.info("DeFiLlama provider cache check:", {
+            elizaLogger.debug("DeFiLlama provider cache check:", {
                 provider: "defillama",
                 hasCachedData,
                 chainDataExists: isValidChainData,
@@ -67,11 +67,11 @@ export function getDefiLlamaProvider(config: ValidatedConfig): Provider | null {
             }
 
             // Get chain TVL
-            elizaLogger.info("Fetching chain TVL data");
+            elizaLogger.debug("Fetching chain TVL data");
             let chainTVL: TVLSummary;
             try {
                 chainTVL = await defiLlama.getChainTVL(DEFAULT_CHAIN);
-                elizaLogger.info("Chain TVL data fetched:", {
+                elizaLogger.debug("Chain TVL data fetched:", {
                     currentTVL: chainTVL.currentTVL,
                     monthlyChange: chainTVL.monthlyChange
                 });
@@ -85,12 +85,12 @@ export function getDefiLlamaProvider(config: ValidatedConfig): Provider | null {
             const chainResponse = defiLlama.formatTVLToText(chainTVL, DEFAULT_CHAIN);
 
             // Get protocol TVLs in parallel
-            elizaLogger.info("Fetching protocol TVL data");
+            elizaLogger.debug("Fetching protocol TVL data");
             const protocolResponses = await Promise.all(
                 PROTOCOLS.map(async protocol => {
                     try {
                         const protocolTVL = await defiLlama.getProtocolTVL(protocol);
-                        elizaLogger.info(`Protocol TVL: ${protocol}`, {
+                        elizaLogger.debug(`Protocol TVL: ${protocol}`, {
                             currentTVL: protocolTVL.currentTVL,
                             monthlyChange: protocolTVL.monthlyChange
                         });
@@ -123,7 +123,7 @@ export function getDefiLlamaProvider(config: ValidatedConfig): Provider | null {
                 cache.set(protocolsCacheKey, validProtocolResponses, { expires: DEFAULT_CACHE_DURATION })
             ]);
 
-            elizaLogger.info("DeFiLlama cache updated:", {
+            elizaLogger.debug("DeFiLlama cache updated:", {
                 provider: "defillama",
                 protocolsCount: validProtocolResponses.length
             });

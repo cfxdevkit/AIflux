@@ -23,7 +23,7 @@ async function executeCfxTransfer(
     params: CfxTransferParams,
     callback: HandlerCallback
 ): Promise<{ tx: `0x${string}`; successMessage: string }> {
-    elizaLogger.info("Starting CFX transfer operation", {
+    elizaLogger.debug("Starting CFX transfer operation", {
         operation: "CFXTransfer",
         amount: params.amount,
         toAddress: params.toAddress,
@@ -101,7 +101,7 @@ async function executeCfxTransfer(
             });
         }
 
-        elizaLogger.info("Transfer transaction submitted", {
+        elizaLogger.debug("Transfer transaction submitted", {
             operation: "CFXTransfer",
             network: params.network,
             transactionHash: tx
@@ -133,7 +133,7 @@ async function executeCfxTransfer(
         // Get final balance
         const finalBalance = await wallet.getBalance();
 
-        elizaLogger.info("Transfer operation completed successfully", {
+        elizaLogger.debug("Transfer operation completed successfully", {
             operation: "CFXTransfer",
             network: params.network,
             transactionHash: tx,
@@ -198,7 +198,7 @@ export function createCfxTransferAction(config: ValidatedConfig): Action {
             _options: any,
             callback: HandlerCallback
         ) => {
-            elizaLogger.info("Starting transfer handler", {
+            elizaLogger.debug("Starting transfer handler", {
                 operation: "CFXTransfer",
                 messageId: message.id
             });
