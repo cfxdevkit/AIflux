@@ -58,10 +58,10 @@ import {
 } from "@elizaos/plugin-coinbase";
 import { coinmarketcapPlugin } from "@elizaos/plugin-coinmarketcap";
 import { coingeckoPlugin } from "@elizaos/plugin-coingecko";
-import { confluxPlugin } from "@elizaos/plugin-conflux";
 import { createCosmosPlugin } from "@elizaos/plugin-cosmos";
 import { cronosZkEVMPlugin } from "@elizaos/plugin-cronoszkevm";
 import { echoChambersPlugin } from "@elizaos/plugin-echochambers";
+import createConfluxPlugin from "@elizaos/plugin-conflux";
 import { evmPlugin } from "@elizaos/plugin-evm";
 import { flowPlugin } from "@elizaos/plugin-flow";
 import { fuelPlugin } from "@elizaos/plugin-fuel";
@@ -709,9 +709,7 @@ export async function createAgent(
         // character.plugins are handled when clients are added
         plugins: [
             bootstrapPlugin,
-            getSecret(character, "CONFLUX_CORE_PRIVATE_KEY")
-                ? confluxPlugin
-                : null,
+            await createConfluxPlugin((secret) => getSecret(character,
             nodePlugin,
             getSecret(character, "TAVILY_API_KEY") ? webSearchPlugin : null,
             getSecret(character, "SOLANA_PUBLIC_KEY") ||

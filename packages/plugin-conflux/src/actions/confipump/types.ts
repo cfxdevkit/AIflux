@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { Content, elizaLogger } from "@elizaos/core";
 
 export const TransferSchema = z.object({
     to: z.string(),
@@ -14,7 +15,7 @@ export const isTransferContent = (object: any): object is TransferContent => {
     if (TransferSchema.safeParse(object).success) {
         return true;
     }
-    console.error("Invalid content: ", object);
+    elizaLogger.error("Invalid content: ", object);
     return false;
 };
 
@@ -58,7 +59,7 @@ export function isPumpContent(object: any): object is PumpContent {
     if (PumpSchema.safeParse(object).success) {
         return true;
     }
-    console.error("Invalid content: ", object);
+    elizaLogger.error("Invalid content: ", object);
     return false;
 }
 
@@ -72,4 +73,61 @@ export function isPumpBuyContent(object: any): object is PumpBuyContent {
 
 export function isPumpSellContent(object: any): object is PumpSellContent {
     return PumpSellSchema.safeParse(object).success;
+}
+
+export const TopPoolsSchema = z.object({
+    type: z.literal("POOLS_INFO"),
+    action: z.literal("GET_POOLS"),
+});
+
+export type TopPoolsContent = z.infer<typeof TopPoolsSchema>;
+
+export const isTopPoolsContent = (obj: any): obj is TopPoolsContent => {
+    return TopPoolsSchema.safeParse(obj).success;
+};
+
+export const SwapSchema = z.object({
+    action: z.literal("swap"),
+    params: z.object({
+        text: z.string(),
+        amount: z.number(),
+        fromToken: z.string(),
+        toToken: z.string(),
+    }),
+});
+
+export type SwapContent = z.infer<typeof SwapSchema>;
+
+export function isSwapContent(object: unknown): object is SwapContent {
+    elizaLogger.debug("Validating content:", object);
+    const result = SwapSchema.safeParse(object);
+    if (!result.success) {
+        elizaLogger.error("Validation errors:", result.error);
+        return false;
+    }
+    return true;
+}
+
+export const ERC20TransferSchema = z.object({
+    text: z.string(),
+    action: z.literal("SEND_TOKEN"),
+    params: z.object({
+        amount: z.number(),
+        token: z.string(),
+        to: z.string(),
+    }),
+});
+
+export type ERC20TransferContent = z.infer<typeof ERC20TransferSchema>;
+
+export function isERC20TransferContent(
+    object: unknown
+): object is ERC20TransferContent {
+    elizaLogger.debug("Validating ERC20 transfer content:", object);
+    const result = ERC20TransferSchema.safeParse(object);
+    if (!result.success) {
+        elizaLogger.error("ERC20 transfer validation errors:", result.error);
+        return false;
+    }
+    return true;
 }

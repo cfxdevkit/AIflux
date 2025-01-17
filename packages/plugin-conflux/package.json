@@ -19,8 +19,12 @@
         "dist"
     ],
     "dependencies": {
+        "@conflux-lib/openapi-sdk-core": "^1.0.0",
+        "@conflux-lib/openapi-sdk-evm": "^1.0.0",
         "@elizaos/core": "workspace:*",
-        "cive": "0.7.1"
+        "@scure/bip32": "^1.6.1",
+        "@scure/bip39": "^1.5.1",
+        "cive": "0.8.1"
     },
     "scripts": {
         "build": "tsup --format esm --dts",

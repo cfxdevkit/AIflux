@@ -19,16 +19,16 @@ import {
 import { privateKeyToAccount } from "viem/accounts";
 import { confluxESpaceTestnet } from "viem/chains";
 import { parseUnits, getAddress } from "viem/utils";
-import { confluxTransferTemplate } from "../templates/transfer";
+import { confiPumpTemplate } from "./template";
 import {
     PumpSchema,
     isPumpContent,
     isPumpBuyContent,
     isPumpCreateContent,
     isPumpSellContent,
-} from "../types";
-import MEMEABI from "../abi/meme";
-import ERC20ABI from "../abi/erc20";
+} from "./types";
+import MEMEABI from "../../utils/wallet/abi/meme";
+import ERC20ABI from "../../utils/wallet/abi/erc20";
 
 // Helper function to check and approve token allowance if needed
 async function ensureAllowance(
@@ -39,7 +39,7 @@ async function ensureAllowance(
     memeAddress: `0x${string}`,
     amount: bigint
 ) {
-    elizaLogger.log(
+    elizaLogger.debug(
         `Checking allowance: token: ${tokenAddress} meme: ${memeAddress} amount: ${amount}`
     );
 
@@ -55,10 +55,10 @@ async function ensureAllowance(
         args: [account.address, memeAddress],
     });
 
-    elizaLogger.log("allowance:", allowance);
+    elizaLogger.debug("allowance:", allowance);
 
     if (allowance < amount) {
-        elizaLogger.log(
+        elizaLogger.debug(
             `allowance(${allowance}) is less than amount(${amount}), approving...`
         );
 
@@ -74,43 +74,41 @@ async function ensureAllowance(
             kzg: null,
         });
 
-        elizaLogger.log(`Approving hash: ${hash}`);
+        elizaLogger.debug(`Approving hash: ${hash}`);
         await publicClient.waitForTransactionReceipt({ hash });
-        elizaLogger.log(`Approving success: ${hash}`);
+        elizaLogger.debug(`Approving success: ${hash}`);
     } else {
-        elizaLogger.log(`No need to approve`);
+        elizaLogger.debug(`No need to approve`);
     }
 }
 
 // Main ConfiPump action definition
 export const confiPump: Action = {
-    name: "CONFI_PUMP",
+    name: "CONFI_PUMP_ESPACE",
     description:
-        "Perform actions on ConfiPump, for example create a new token, buy a token, or sell a token.",
-    similes: ["SELL_TOKEN", "BUY_TOKEN", "CREATE_TOKEN"],
+        "Perform actions on ConfiPump on Conflux eSpace network. Create, buy, or sell tokens on the eSpace network.",
+    similes: ["SELL_TOKEN_ESPACE", "BUY_TOKEN_ESPACE", "CREATE_TOKEN_ESPACE"],
     examples: [
         // Create token example
         [
             {
                 user: "{{user1}}",
                 content: {
-                    text: "Create a new token called GLITCHIZA with symbol GLITCHIZA and generate a description about it.",
+                    text: "Create a new token called GLITCHIZA with symbol GLITCHIZA and generate a description about it on eSpace",
                 },
             },
             {
                 user: "{{user2}}",
                 content: {
-                    text: "Token GLITCHIZA (GLITCHIZA) created successfully!\nContract Address: 0x1234567890abcdef\n",
-                    action: "CREATE_TOKEN",
+                    text: "Token GLITCHIZA (GLITCHIZA) created successfully on eSpace network!\nContract Address: 0x1234567890abcdef\n",
+                    action: "CREATE_TOKEN_ESPACE",
                     content: {
                         tokenInfo: {
                             symbol: "GLITCHIZA",
-                            address:
-                                "EugPwuZ8oUMWsYHeBGERWvELfLGFmA1taDtmY8uMeX6r",
-                            creator:
-                                "9jW8FPr6BSSsemWPV22UUCzSqkVdTp6HTyPqeqyuBbCa",
+                            address: "0x1234567890abcdef",
+                            creator: "0x9876543210fedcba",
                             name: "GLITCHIZA",
-                            description: "A GLITCHIZA token",
+                            description: "A GLITCHIZA token on Conflux eSpace",
                         },
                         amount: "1",
                     },
@@ -122,14 +120,14 @@ export const confiPump: Action = {
             {
                 user: "{{user1}}",
                 content: {
-                    text: "Buy 0.00069 CFX worth of GLITCHIZA(0x1234567890abcdef)",
+                    text: "Buy 0.00069 CFX worth of GLITCHIZA(0x1234567890abcdef) on eSpace",
                 },
             },
             {
                 user: "{{user2}}",
                 content: {
-                    text: "0.00069 CFX bought successfully!",
-                    action: "BUY_TOKEN",
+                    text: "0.00069 CFX bought successfully on eSpace network!",
+                    action: "BUY_TOKEN_ESPACE",
                     content: {
                         address: "0x1234567890abcdef",
                         amount: "0.00069",
@@ -142,14 +140,14 @@ export const confiPump: Action = {
             {
                 user: "{{user1}}",
                 content: {
-                    text: "Sell 0.00069 CFX worth of GLITCHIZA(0x1234567890abcdef)",
+                    text: "Sell 0.00069 CFX worth of GLITCHIZA(0x1234567890abcdef) on eSpace",
                 },
             },
             {
                 user: "{{user2}}",
                 content: {
-                    text: "0.00069 CFX sold successfully: 0x1234567890abcdef",
-                    action: "SELL_TOKEN",
+                    text: "0.00069 CFX sold successfully on eSpace network: 0x1234567890abcdef",
+                    action: "SELL_TOKEN_ESPACE",
                     content: {
                         address: "0x1234567890abcdef",
                         amount: "0.00069",
@@ -182,7 +180,7 @@ export const confiPump: Action = {
         // Generate content based on template
         const context = composeContext({
             state,
-            template: confluxTransferTemplate,
+            template: confiPumpTemplate,
         });
 
         const content = await generateObject({
@@ -214,13 +212,9 @@ export const confiPump: Action = {
             switch (contentObject.action) {
                 case "CREATE_TOKEN":
                     if (!isPumpCreateContent(contentObject)) {
-                        elizaLogger.error(
-                            "Invalid PumpCreateContent: ",
-                            contentObject
-                        );
-                        throw new Error("Invalid PumpCreateContent");
+                        throw new Error("Invalid content");
                     }
-                    elizaLogger.log(
+                    elizaLogger.debug(
                         "creating: ",
                         contentObject.params.name,
                         contentObject.params.symbol,
@@ -240,17 +234,13 @@ export const confiPump: Action = {
 
                 case "BUY_TOKEN":
                     if (!isPumpBuyContent(contentObject)) {
-                        elizaLogger.error(
-                            "Invalid PumpBuyContent: ",
-                            contentObject
-                        );
-                        throw new Error("Invalid PumpBuyContent");
+                        throw new Error("Invalid content");
                     }
                     value = parseUnits(
                         contentObject.params.value.toString(),
                         18
                     );
-                    elizaLogger.log(
+                    elizaLogger.debug(
                         "buying: ",
                         contentObject.params.tokenAddress,
                         value
@@ -269,16 +259,12 @@ export const confiPump: Action = {
 
                 case "SELL_TOKEN":
                     if (!isPumpSellContent(contentObject)) {
-                        elizaLogger.error(
-                            "Invalid PumpSellContent: ",
-                            contentObject
-                        );
-                        throw new Error("Invalid PumpSellContent");
+                        throw new Error("Invalid content");
                     }
                     const tokenAddress = getAddress(
                         contentObject.params.tokenAddress as `0x${string}`
                     );
-                    elizaLogger.log(
+                    elizaLogger.debug(
                         "selling: ",
                         tokenAddress,
                         account.address,
@@ -325,7 +311,7 @@ export const confiPump: Action = {
                 value,
                 account,
             });
-            elizaLogger.log("simulate: ", simulate);
+            elizaLogger.debug("simulate: ", simulate);
 
             const hash = await walletClient.sendTransaction({
                 account,
